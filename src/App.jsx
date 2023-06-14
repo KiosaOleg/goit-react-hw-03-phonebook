@@ -1,31 +1,30 @@
-import "./App.css";
-import { nanoid } from "nanoid";
-import React, { Component } from "react";
-import {AppContainer, H1,  H2} from "App.styled";
+import './App.css';
+import { nanoid } from 'nanoid';
+import React, { Component } from 'react';
+import { AppContainer, H1, H2 } from 'App.styled';
 
-import Phonebook from "components/Phonebook/Phonebook";
-import SearchInput from "components/SearchInput/SearchInput";
-import ContactList from "components/ContactList/ContactList";
+import Phonebook from 'components/Phonebook/Phonebook';
+import SearchInput from 'components/SearchInput/SearchInput';
+import ContactList from 'components/ContactList/ContactList';
 
 export default class App extends Component {
   state = {
-    contacts: [
-      { id: "id-1", img:"", name: "Rosie Simpson", phoneNumber: "459-12-56" },
-      { id: "id-2", img:"", name: "Hermione Kline", phoneNumber: "443-89-12" },
-      { id: "id-3", img:"", name: "Eden Clements", phoneNumber: "645-17-79" },
-      { id: "id-4", img:"", name: "Annie Copeland", phoneNumber: "227-91-26" },
-    ],
-    filter: "",
+    contacts: [],
+    filter: '',
   };
-  formSubmitHandler = ({img, name, phoneNumber }) => {
+
+  // { id: "id-1", img:"", name: "Rosie Simpson", phoneNumber: "459-12-56" },
+  // { id: "id-2", img:"", name: "Hermione Kline", phoneNumber: "443-89-12" },
+  // { id: "id-3", img:"", name: "Eden Clements", phoneNumber: "645-17-79" },
+  // { id: "id-4", img:"", name: "Annie Copeland", phoneNumber: "227-91-26" },
+  formSubmitHandler = ({ img, name, phoneNumber }) => {
     const contact = {
       id: nanoid(),
       name,
       phoneNumber,
-      img,
     };
-    
-    const findContact = this.state.contacts.find((contact) =>
+
+    const findContact = this.state.contacts.find(contact =>
       contact.name.toLowerCase().includes(name.toLowerCase())
     );
 
@@ -36,22 +35,37 @@ export default class App extends Component {
         }));
   };
 
-  changeFilterInput = (event) => {
+  changeFilterInput = event => {
     this.setState({ filter: event.target.value });
   };
 
   findContacts = () => {
     const { filter, contacts } = this.state;
-    return contacts.filter((contact) =>
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
   };
 
-  deleteContact = (id) => {
-    this.setState((prevState) => ({
-      contacts: prevState.contacts.filter((contact) => contact.id !== id),
+  deleteContact = id => {
+    this.setState(prevState => ({
+      contacts: prevState.contacts.filter(contact => contact.id !== id),
     }));
   };
+
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    const parseContacts = JSON.parse(contacts);
+
+    if (parseContacts) {
+      this.setState({ contacts: parseContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+    }
+  }
 
   render() {
     return (
